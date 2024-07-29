@@ -2,12 +2,11 @@
 
 using namespace std;
 
-// Función auxiliar para encontrar el índice del menor y segundo menor costo en una columna
-void encontrar_min_y_segundo_min_indices(const int* arr, const int* indices_excluidos, int tamano, int& min_indice, int& segundo_min_indice) {
+void encontrar_minimos(const int* arr, const int* indices_excluidos, int tamano, int& min_indice, int& segundo_min_indice) {
     min_indice = -1;
     segundo_min_indice = -1;
-    int min_valor = 1000000; // Un valor lo suficientemente grande
-    int segundo_min_valor = 1000000; // Un valor lo suficientemente grande
+    int min_valor = 1000000; // Un valor lo suficientemente grande para las comparaciones
+    int segundo_min_valor = 1000000;
 
     for (int i = 0; i < tamano; ++i) {
         bool excluido = false;
@@ -31,7 +30,7 @@ void encontrar_min_y_segundo_min_indices(const int* arr, const int* indices_excl
         }
     }
 
-    // Si no se encuentra un segundo menor índice, devuelve el mismo índice
+    // Si no se encuentra un segundo menor Ã­ndice, devuelve el mismo Ã­ndice
     if (segundo_min_indice == -1) {
         segundo_min_indice = min_indice;
     }
@@ -40,18 +39,18 @@ void encontrar_min_y_segundo_min_indices(const int* arr, const int* indices_excl
 int main() {
     int filas, columnas;
 
-    // Ingresar el número de filas y columnas
-    cout << "Ingrese el número de filas: ";
+    // para ingresar el numero de filas y columnas de la matriz de costos
+    cout << "Ingrese el numero de filas: ";
     cin >> filas;
-    cout << "Ingrese el número de columnas: ";
+    cout << "Ingrese el numero de columnas: ";
     cin >> columnas;
 
-    // Crear matrices dinámicas
+    // Crear matrices dinÃ¡micas
     int** costos = new int* [filas];
     for (int i = 0; i < filas; ++i) {
         costos[i] = new int[columnas];
     }
-    int* suministro = new int[filas];
+    int* oferta = new int[filas];
     int* demanda = new int[columnas];
     int** asignacion = new int* [filas];
     for (int i = 0; i < filas; ++i) {
@@ -59,25 +58,25 @@ int main() {
     }
     int costo_total = 0; // Variable para acumular el costo total
 
-    // Ingresar datos del problema
+    // Para ingresar la matriz de costos
     cout << "Ingrese los costos (matriz " << filas << "x" << columnas << "):\n";
     for (int i = 0; i < filas; ++i) {
         for (int j = 0; j < columnas; ++j) {
             cin >> costos[i][j];
         }
     }
-
-    cout << "Ingrese el suministro (" << filas << " elementos):\n";
+    //Para ingresar por teclado la oferta
+    cout << "Ingrese la oferta (" << filas << " elementos):\n";
     for (int i = 0; i < filas; ++i) {
-        cin >> suministro[i];
+        cin >> oferta[i];
     }
-
+    //para ingresar por teclado las respectivas demandas
     cout << "Ingrese la demanda (" << columnas << " elementos):\n";
     for (int j = 0; j < columnas; ++j) {
         cin >> demanda[j];
     }
 
-    // Recorrer las columnas de izquierda a derecha
+    // Para recorrer las columnas de izquierda a derecha
     for (int j = 0; j < columnas; ++j) {
         int* indices_excluidos = new int[filas];
         int cuenta_excluidos = 0;
@@ -88,13 +87,13 @@ int main() {
             for (int i = 0; i < filas; ++i) {
                 columna[i] = costos[i][j];
             }
-            encontrar_min_y_segundo_min_indices(columna, indices_excluidos, filas, min_indice, segundo_min_indice);
+            encontrar_minimos(columna, indices_excluidos, filas, min_indice, segundo_min_indice);
 
             int fila = (demanda[j] > 0) ? min_indice : segundo_min_indice;
-            int cantidad = (suministro[fila] < demanda[j]) ? suministro[fila] : demanda[j];
+            int cantidad = (oferta[fila] < demanda[j]) ? oferta[fila] : demanda[j];
             asignacion[fila][j] = cantidad;
-            costo_total += cantidad * costos[fila][j]; // Acumular el costo
-            suministro[fila] -= cantidad;
+            costo_total += cantidad * costos[fila][j];
+            oferta[fila] -= cantidad;
             demanda[j] -= cantidad;
             indices_excluidos[cuenta_excluidos++] = fila;
 
@@ -104,8 +103,7 @@ int main() {
         delete[] indices_excluidos;
     }
 
-    // Imprimir la solución inicial
-    cout << "Asignación inicial basada en la heurística personalizada:\n";
+    cout << "Asignacion inicial o solucion inicial :\n";
     for (int i = 0; i < filas; ++i) {
         for (int j = 0; j < columnas; ++j) {
             cout << asignacion[i][j] << " ";
@@ -113,26 +111,16 @@ int main() {
         cout << "\n";
     }
 
-    cout << "\nSuministros restantes:";
-    for (int i = 0; i < filas; ++i) {
-        cout << " " << suministro[i];
-    }
-    cout << "\nDemandas restantes:";
-    for (int j = 0; j < columnas; ++j) {
-        cout << " " << demanda[j];
-    }
     cout << "\n";
 
-    // Imprimir el costo total óptimo
-    cout << "\nCosto total óptimo: " << costo_total << "\n";
+    cout << "\nCosto total inicial: " << costo_total << "\n";
 
-    // Liberar memoria dinámica
     for (int i = 0; i < filas; ++i) {
         delete[] costos[i];
         delete[] asignacion[i];
     }
     delete[] costos;
-    delete[] suministro;
+    delete[] oferta;
     delete[] demanda;
     delete[] asignacion;
 
